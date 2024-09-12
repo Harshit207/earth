@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Earth</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+        }
+        #earthCanvas {
+            width: 400px;
+            height: 400px;
+            cursor: grab;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="earthCanvas"></canvas>
+
+    <script>
+        // Get canvas and set up context
+        const canvas = document.getElementById('earthCanvas');
+        const ctx = canvas.getContext('2d');
+        const earthImg = new Image();
+        earthImg.src = 'https://upload.wikimedia.org/wikipedia/commons/9/97/The_Earth_seen_from_Apollo_17.jpg';
+
+        // Set canvas size
+        canvas.width = 400;
+        canvas.height = 400;
+
+        // Earth rotation variables
+        let angleX = 0;
+        let angleY = 0;
+        let isDragging = false;
+        let lastX, lastY;
+
+        // Draw Earth function
+        function drawEarth() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(canvas.width / 2, canvas.height / 2);
+            ctx.rotate(angleX);
+            ctx.drawImage(earthImg, -canvas.width / 2, -canvas.height / 2, canvas.width, canvas.height);
+            ctx.restore();
+        }
+
+        // Mouse events
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastX = e.clientX;
+            lastY = e.clientY;
+            canvas.style.cursor = 'grabbing';
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                let deltaX = e.clientX - lastX;
+                let deltaY = e.clientY - lastY;
+                angleX += deltaX * 0.01;  // Control rotation speed
+                angleY += deltaY * 0.01;
+                lastX = e.clientX;
+                lastY = e.clientY;
+                drawEarth();
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+            canvas.style.cursor = 'grab';
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            isDragging = false;
+            canvas.style.cursor = 'grab';
+        });
+
+        // Draw the initial Earth when the image is loaded
+        earthImg.onload = () => {
+            drawEarth();
+        };
+    </script>
+</body>
+</html>
